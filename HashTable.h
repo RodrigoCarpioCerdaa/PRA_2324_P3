@@ -30,42 +30,72 @@ class HashTable: public Dict<V> {
 
     public:
 	void insert(std::string key, V value) override{	
-		for(int a=0; a<max; a++){
-			if(key == table.key){
-				throw std::runtime_error("ya existe esta key");
-			}
-			else{
-				table (key, value);
-				n++;
-			}
+		int cubeta = h(key);
+		int posicion = table[cubeta].search(key);
+		if (posicion != -1){
+			throw std::runtime_error("la clave ya existe 1");
 		}
+		else{
+			table[cubeta].insert(table[cubeta].size(), TableEntry(key, value));
+			n++;
+		}
+	
 	}
 	V search(std::string key) override{
-		for(int a=0; a<max; a++){
-			if(key == table.key){
-				return table.value;
-			}
-			else{
-				throw std::runtime_error("no existe esta key");
-			}
+		int cubeta = h(key);
+		int posicion = table[cubeta].search(key);
+
+		if (posicion >= 0){
+			V valor = table[cubeta].get(posicion).value;
+			return valor;
+
+		}
+		else{
+			std::runtime_error("no se encuentra la clave 1");
 		}
 	}
 	V remove(std::string key) override{
-		for(int a=0; a<max; a++){
-			if(key == table.key){
-				table.key = nullptr;
-				n--;
-			}
-			else{
-				throw std::runtime_error("no existe esta key 2");
-			}
+		int cubeta = h(key);
+		int posicion = table[cubeta].search(key);
+		if(posicion >= 0){
+			V pepe =table[cubeta].get(posicion);
+			table[cubeta].remove(pepe);
+			n--;
+		}
+		else{
+			std::runtime_error("no se encuentra la clave 2");
 		}
 	}
 	int entries() override{
 		return n;
 		
 	}
-        
+	HashTable(int size){
+		table = new ListLinked<TableEntry<V>>[size];
+		n++;
+		max = size;
+	}
+	~HashTable(){
+		delete[] table;
+	}
+	int capacity(){
+		return max;
+	}
+	friend std::ostream&operator<<(std::ostream &out, const HashTable<V> &th){
+		out << &th << std::endl;
+		return out;
+	}
+	V operator[](std::string key){
+		int cubeta = h(key);
+		int posicion = table[cubeta].search(key);
+		if(posicion >=0){
+			return table[cubeta].get(posicion).value;
+		}
+		else{
+			throw std::runtime_error("no se ha podido encontrar la clave");
+		}
+	}
+        	
 };
 
 #endif
