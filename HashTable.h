@@ -82,7 +82,12 @@ class HashTable: public Dict<V> {
 		return max;
 	}
 	friend std::ostream&operator<<(std::ostream &out, const HashTable<V> &th){
-		out << &th << std::endl;
+		out <<"=============="<<std::endl;
+
+		for(int i=0; i < th.max; i++){
+			out <<"Cubeta "<< i<<std::endl << "List => ["<<std::endl<<th.table[i]<<std::endl<<"]"<<std::endl;
+		}
+		out << "=============="<<std::endl;
 		return out;
 	}
 	V operator[](std::string key){
