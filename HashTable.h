@@ -16,63 +16,58 @@ class HashTable: public Dict<V> {
 	int max;//Tamaño de la tabla hash(cubetas)
 	ListLinked<TableEntry<V>>* table;//tabla de cubetas representadas por un array de punteros a listas enlazadas(tipo ListLinked) que almacenan los pares key->value
 	int h(std::string key){
-		int i=0;
-		char c;
-		int suma;
-		std::size_t tamano = key.size();
-		for(int i; i<tamano; i++){
-			c = key.at(i);
-			c = int(c);
-			suma += c;
+		int suma = 0;
+		for(size_t i=0; i<key.length(); i++){
+			suma += static_cast<int>(key.at(i));
 		}
-		return suma%max;
+		return suma % max;
 	}
+
 
     public:
 	void insert(std::string key, V value) override{	
-		int cubeta = h(key);
-		int posicion = table[cubeta].search(key);
-		if (posicion != -1){
-			throw std::runtime_error("la clave ya existe 1");
+		TableEntry<V> c (key,value);
+
+		int r = h(key);
+		for(int i=0;i<table[r].size();i++){
+			if(table[r].get(i)==c){
+				throw std::runtime_error("ya existe esta clave");
+			}
 		}
-		else{
-			table[cubeta].insert(table[cubeta].size(), TableEntry(key, value));
-			n++;
-		}
-	
+		table[r].append(c);
+		n++;
 	}
 	V search(std::string key) override{
-		int cubeta = h(key);
-		int posicion = table[cubeta].search(key);
-
-		if (posicion >= 0){
-			V valor = table[cubeta].get(posicion).value;
-			return valor;
-
+		TableEntry c (key, 0);
+		int r = h(key);
+		for(int i=0; i<table[r].size();i++){
+			if(table[r].get(i)==c){
+				return table[r].get(i).value;
+			}
+		
 		}
-		else{
-			std::runtime_error("no se encuentra la clave 1");
-		}
+		throw std::runtime_error("no se encuentra la key 1");
 	}
 	V remove(std::string key) override{
-		int cubeta = h(key);
-		int posicion = table[cubeta].search(key);
-		if(posicion >= 0){
-			V pepe =table[cubeta].get(posicion);
-			table[cubeta].remove(pepe);
-			n--;
+		TableEntry c (key, 0);
+		int r = h(key);
+		for(int i=0; i<table[r].size();i++){
+			if(table[r].get(i) == c){
+				
+				V inigo = table[r].remove(i).value;
+				n--;
+				return inigo;
+			}
 		}
-		else{
-			std::runtime_error("no se encuentra la clave 2");
-		}
+		throw std::runtime_error("no se encuentra la key 2");
 	}
-	int entries() override{
+	int entries() override final{
 		return n;
 		
 	}
 	HashTable(int size){
 		table = new ListLinked<TableEntry<V>>[size];
-		n++;
+		n = 0;
 		max = size;
 	}
 	~HashTable(){
@@ -81,24 +76,19 @@ class HashTable: public Dict<V> {
 	int capacity(){
 		return max;
 	}
-	friend std::ostream&operator<<(std::ostream &out, const HashTable<V> &th){
-		out <<"=============="<<std::endl;
+	friend std::ostream& operator<<(std::ostream &out, const HashTable<V> &th){
+		out << "HashTable [entries: "<< th.n <<", capacity: " << th.max << "]"<< std::endl;
+		out <<"=================="<<std::endl;
 
-		for(int i=0; i < th.max; i++){
-			out <<"Cubeta "<< i<<std::endl << "List => ["<<std::endl<<th.table[i]<<std::endl<<"]"<<std::endl;
+		for (int i = 0; i < th.max; i++){
+			out<<"Cubeta "<<i<<std::endl<<"List =>  ["<<std::endl<<th.table[i]<<std::endl<<"]"<<std::endl;
 		}
-		out << "=============="<<std::endl;
-		return out;
+
+		out <<"=================="<<std::endl;
+		return out;	
 	}
 	V operator[](std::string key){
-		int cubeta = h(key);
-		int posicion = table[cubeta].search(key);
-		if(posicion >=0){
-			return table[cubeta].get(posicion).value;
-		}
-		else{
-			throw std::runtime_error("no se ha podido encontrar la clave");
-		}
+		return search(key);
 	}
         	
 };
