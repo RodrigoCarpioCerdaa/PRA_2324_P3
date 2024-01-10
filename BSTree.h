@@ -91,7 +91,7 @@ class BSTree {
 		}
 	}
 	BSNode<T>* remove_max(BSNode<T>* n){
-		if(n->rifht == nullptr){
+		if(n->right == nullptr){
 			return n->left;
 		}
 		else{
@@ -117,28 +117,29 @@ class BSTree {
     public:
         BSTree(){
 		nelem = 0;
+		root = nullptr;	
 	}
 	int size() const{
 		return nelem;
 	}
 	T search(T e) const{
-		return search(root, e).elem;
+		return search(root, e)->elem;
 	}
 	T operator[] (T e) const{
-		search(root, e);
+		search(e);
 	}
 	void insert(T e){
 		insert(root, e);
 	}
 	friend std::ostream& operator <<(std::ostream &out, const BSTree<T> &bst){
-		print_inorder( out, bst);
+		bst.print_inorder( out, bst.root);
 		return out;
 	}
 	void remove (T e){
 		remove(root, e);
 	}
 	~BSTree(){
-		delete_cascade();
+		delete_cascade(root);
 	}
 
     
